@@ -6,8 +6,9 @@ defmodule Feedback.Repo.Migrations.CreateFeedback do
       add :rating, :integer
       add :caption, :string
       add :comments, :string
-      add :timestamp, :utc_datetime
+      add :responsestatus, :string
       add :customer_id, references(:customer)
+
       timestamps()
     end
   end

@@ -10,7 +10,7 @@ defmodule Feedback.Customer do
     field :email, :string
     field :password, :string
     # Add other fields as needed (e.g., role, preferences)
-    timestamps()
+   timestamps()
   end
 
 

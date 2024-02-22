@@ -140,7 +140,7 @@ defmodule Feedback do
 
   defp option(1, customer) do
     create_feedback(customer.id)
-    |>customer_page()
+    customer_page(customer)
   end
 
   defp option(2, customer) do
@@ -148,14 +148,14 @@ defmodule Feedback do
     customer_page(customer)
   end
 
-  defp option(3 , customer) do
-    create_feedback(customer.id)
-    |>customer_page()
+  defp option(3 , _customer) do
+    # create_feedback(customer.id)
+    # |>customer_page()
   end
 
-  defp option(4, customer) do
-    create_feedback(customer.id)
-    |>customer_page()
+  defp option(4, _customer) do
+    # create_feedback(customer.id)
+    # |>customer_page()
   end
 
   defp option(5, customer) do
@@ -181,6 +181,13 @@ defmodule Feedback do
 
   def get_all do
     Customer.get_all_customers()
+  end
+
+  def test_add_customer do
+     Customer.add_customer(%{name: "Jay Maxey", username: "Max", email: "jay@email.com", password: "123456789"})
+  end
+  def test_add_feedback do
+    Feedback.add_feedback(%{rating: 4, caption: "My 2nd trip", comments: "It was so fun", responsestatus: "Not responded", customer_id: 1});
   end
 end
 

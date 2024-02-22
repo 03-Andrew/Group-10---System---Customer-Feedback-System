@@ -9,7 +9,7 @@ defmodule Feedback.Feedback do
     field :rating, :integer
     field :caption, :string
     field :comments, :string
-    field :timestamp, :utc_datetime
+    field :responsestatus, :string
     belongs_to :customer, Customer
     timestamps()
   end
@@ -17,7 +17,7 @@ defmodule Feedback.Feedback do
   @doc false
   def changeset(feedback, attrs) do
     feedback
-    |> cast(attrs, [:rating, :caption, :comments, :timestamp, :customer_id])
+    |> cast(attrs, [:rating, :caption, :comments, :responsestatus, :customer_id])
     |> validate_number(:rating, greater_than: 0, less_than_or_equal_to: 5)
     |> validate_length(:comments, max: 255)
   end
@@ -26,8 +26,8 @@ defmodule Feedback.Feedback do
     case %Feedback{}
         |> Feedback.changeset(params)
         |> Repo.insert() do
-      {:ok, _feedback} ->
-        :ok
+      {:ok, feedback} ->
+        {:ok, feedback}
       {:error, changeset} ->
         {:error, changeset}
     end

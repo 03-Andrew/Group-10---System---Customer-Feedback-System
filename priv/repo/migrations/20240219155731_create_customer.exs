@@ -7,7 +7,7 @@ defmodule Feedback.Repo.Migrations.CreateCustomer do
       add :username, :string
       add :email, :string, unique: true
       add :password, :string
-      # Add other fields as needed (e.g., role, preferences)
+
       timestamps()
     end
   end
