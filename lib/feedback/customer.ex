@@ -42,8 +42,7 @@ defmodule Feedback.Customer do
   end
 
 
-  def edit_customer_field(customer_id, field, value) do
-    customer = Repo.get(Customer, customer_id)
+  def edit_customer_field(customer, field, value) do
     case customer do
       nil ->
         {:error, "Customer not found"}
@@ -52,7 +51,7 @@ defmodule Feedback.Customer do
 
         case Repo.update(changeset) do
           {:ok, _updated_customer} ->
-            {:ok, "Successfully updated"}
+            IO.puts("Edited field")
           {:error, _changeset} ->
             if not String.match?(value, ~r/@/), do: IO.puts("Email has no '@'")
         end
@@ -83,8 +82,20 @@ defmodule Feedback.Customer do
 
 
   def get_all_customers do
-    Repo.all(Customer)
+    Customer
+    |> Repo.all()
+    |> Enum.each(&print_customer/1)
   end
+
+  defp print_customer(customer) do
+    formatted_customer = format_customer(customer)
+    IO.puts(formatted_customer)
+  end
+
+  defp format_customer(customer) do
+    " \n| #{customer.id} | #{customer.name} | #{customer.username} | #{customer.email} |  #{customer.inserted_at} |"
+  end
+
 
   def get_customer_by_email(email) do
     from(c in Customer, where: c.email == ^email) |> Repo.one()
