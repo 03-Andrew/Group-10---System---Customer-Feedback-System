@@ -28,7 +28,7 @@ defmodule Feedback.Feedback do
         |> Feedback.changeset(params)
         |> Repo.insert() do
       {:ok, _feedback} ->
-        "Successfully added"
+        IO.puts("Successfully Added")
       {:error, changeset} ->
         {:error, changeset}
     end

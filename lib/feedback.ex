@@ -17,21 +17,7 @@ defmodule Feedback do
             "      (5) Exit                       \n")
   end
 
-  defp customer_print(customer) do
-    IO.puts("╭───────────────────────────────────╮\n"<>
-            "│          Feedback System          │\n"<>
-            "╰───────────────────────────────────╯\n"<>
-            "      Hi #{customer.username}        \n"<>
-            "               Menu:                 \n"<>
-            "      (1) Add Feedback               \n"<>
-            "      (2) View All Feedbacks         \n"<>
-            "      (3) View All my Feedbacks      \n"<>
-            "      (4) Edit Feedback              \n"<>
-            "      (5) Edit Customer Details      \n"<>
-            "      (6) Delete Feedback            \n"<>
-            "      (7) Log out                    \n"<>
-            "                                      ")
-  end
+
   defp admin_print do
     IO.puts("╭───────────────────────────────────╮\n"<>
             "│              Admin                │\n"<>
@@ -76,6 +62,11 @@ defmodule Feedback do
   defp option(_) do
     IO.puts("Invalid option")
     main_menu()
+  end
+
+   def option_page do
+    op = input("   (1) Back to menu\n")
+    if op == "1", do: main_menu()
   end
 
   # --------------------------------------------------------------------------------------------------------
@@ -191,7 +182,7 @@ defmodule Feedback do
 
 
   def a_option_page() do
-    op = input("   (1) Admin Page   (2) Back to Menu\n")
+    op = input("\n   (1) Admin Page   (2) Back to Menu\n")
     a_option(op)
   end
 
@@ -199,7 +190,7 @@ defmodule Feedback do
   defp a_option(_), do: main_menu()
 
   # --------------------------------------------------------------------------------------------------------
-  # ----------------------------------------Create Feedback-------------------------------------------------
+  # -------------------------------------------Add Feedback-------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
   def create_feedback(id) do
     feedback_print()
@@ -210,19 +201,22 @@ defmodule Feedback do
   defp get_feedback_data(id) do
     caption = input("Caption:\n  ")
     rate = input("Rate (0-5):\n  ")
+          |> String.to_integer()
+          |> Kernel.max(0)
+          |> Kernel.min(5)
     comment = input("Comment:\n  ")
-    %{rating: String.to_integer(rate),caption: caption, comments: comment, responsestatus: "Not responded", customer_id: id}
+    %{rating: rate, caption: caption, comments: comment, response_status_id: 1, customer_id: id}
   end
 
   # --------------------------------------------------------------------------------------------------------
   # ------------------------------------------Edit Feedback-------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
 
-  def edit_feedback() do
+  def edit_feedback(customer) do
     feedback_id = input("Enter feedback id: ") |> String.to_integer()
     IO.puts("Field to edit: \n   (1) Caption\n   (2) Rating\n   (3) Comment")
 
-    op = edit_field(input("")|>String.to_integer())
+    op = edit_field(input(""), customer)
     val = input("Enter new value: ")
     val =
     if op == :rating do
@@ -233,10 +227,10 @@ defmodule Feedback do
     Feedback.edit_feedback_field(feedback_id, op, val)
   end
 
-  @spec edit_field(1 | 2 | 3) :: :caption | :comment | :rating
-  def edit_field(1), do: :caption
-  def edit_field(2), do: :rating
-  def edit_field(3), do: :comment
+  def edit_field("1", _customer), do: :caption
+  def edit_field("2", _customer), do: :rating
+  def edit_field("3", _customer), do: :comments
+  def edit_field(_, customer), do: edit_feedback(customer)
 
 
   # --------------------------------------------------------------------------------------------------------
@@ -269,42 +263,63 @@ defmodule Feedback do
   # --------------------------------------------------------------------------------------------------------
   # ----------------------------------------Customer Page---------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
+  defp customer_print(customer) do
+    IO.puts("╭───────────────────────────────────╮\n"<>
+            "│          Feedback System          │\n"<>
+            "╰───────────────────────────────────╯\n"<>
+            "      Hi #{customer.username}        \n"<>
+            "               Menu:                 \n"<>
+            "      (1) Add Feedback               \n"<>
+            "      (2) View All Feedbacks         \n"<>
+            "      (3) View All my Feedbacks      \n"<>
+            "      (4) Edit Feedback              \n"<>
+            "      (5) Edit Customer Details      \n"<>
+            "      (6) Delete Feedback            \n"<>
+            "      (7) Log out                    \n"<>
+            "                                      ")
+  end
+
   def customer_page(customer) do
     customer_print(customer)
-    option = input("What do you want to do: ") |> String.to_integer()
+    option = input("What do you want to do: ")
     option(option, customer)
   end
 
-  defp option(1, customer) do
+  defp option("1", customer) do
     create_feedback(customer.id)
     option_page(customer)
   end
 
-  defp option(2, customer) do
+  defp option("2", customer) do
     Feedback.get_all_feedbacks()
     option_page(customer)
   end
 
-  defp option(3 , customer) do
+  defp option("3" , customer) do
     Feedback.get_feedbacks_by_customer(customer.id)
     option_page(customer)
   end
 
-  defp option(4, customer) do
+  defp option("4", customer) do
     Feedback.get_feedbacks_by_customer(customer.id)
-    edit_feedback()
-    option_page(customer)
+    edit_feedback(customer)
   end
 
-  defp option(5, customer) do
+  defp option("5", customer) do
     edit_customer_deets(customer)
-    option_page(customer)
+    updatedCustomer = Customer.get_customer_by_id(customer.id)
+    option_page(updatedCustomer)
   end
 
-  defp option(6, customer) do
+  defp option("6", customer) do
+    Feedback.get_feedbacks_by_customer(customer.id)
     id = input("Enter Feedback id to delete: ") |> String.to_integer()
     Feedback.delete_feedback_by_id(id, customer.id)
     option_page(customer)
+  end
+
+  defp option("7", _customer) do
+    main_menu()
   end
 
   defp option(_,customer) do
@@ -312,23 +327,15 @@ defmodule Feedback do
     customer_page(customer)
   end
 
-
-
-  def option_page do
-    op = input("   (1) Back to menu\n")
-    if op == "1", do: main_menu()
-  end
-
   def option_page(customer) do
     op = input("   (1) Back to account   (2) Back to menu\n")
-    |> String.to_integer()
     option2(op, customer)
   end
 
-  defp option2(1, customer) do
+  defp option2("1", customer) do
     customer_page(customer)
   end
-  defp option2(2, _customer) do
+  defp option2("2", _customer) do
     main_menu()
   end
   defp option2(_, customer) do
@@ -339,37 +346,28 @@ defmodule Feedback do
   # --------------------------------------------------------------------------------------------------------
   # ------------------------------------------Edit Customer-------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
-  def edit_customer() do
-    feedback_id = input("Enter feedback id: ") |> String.to_integer()
-    IO.puts("Field to edit: \n   (1) Caption\n   (2) Rating\n   (3) Comment")
+  def edit_customer(customer) do
+    IO.puts("Field to edit: \n   (1) Name (#{customer.name})\n   (2) Username(#{customer.usernme})\n"<>
+            "(3) Email(#{customer.email})\n   (4) Password")
+    op = edit_c_field(input("") |> String.to_integer())
+    edit_customer_field(customer, op)
+  end
 
-    op = edit_field(input("")|>String.to_integer())
+  defp edit_customer_field(customer, :password) do
+    pass = input("Enter Old password: ")
+    new = input("Enter new password: ")
+    Customer.change_password(customer, pass, new)
+  end
+
+  defp edit_customer_field(customer, op) do
     val = input("Enter new value: ")
-    val =
-    if op == :rating do
-      val |> String.to_integer()
-    else
-      val
-    end
-    Feedback.edit_feedback_field(feedback_id, op, val)
-    IO.puts("Edited feedback")
+    Customer.edit_customer_field(customer, op, val)
   end
 
-
-
-
-
-  def edit_c_field(1) do
-    :name
-  end
-
-  def edit_c_field(2) do
-    :username
-  end
-
-  def edit_c_field(3) do
-    :email
-  end
+  defp edit_c_field(1), do: :name
+  defp edit_c_field(2), do: :username
+  defp edit_c_field(3), do: :email
+  defp edit_c_field(4), do: :password
 
   defp input(prompt) do
     IO.gets(prompt)

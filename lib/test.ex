@@ -9,7 +9,7 @@ defmodule Test do
   end
 
   def test_add_response do
-    Response.add_response(%{status: "Not Responded"})
+    Response.add_response(%{status: "Responded"})
   end
 
   def test_get_feedback_by do
@@ -25,6 +25,10 @@ defmodule Test do
   end
 
   def test_delete do
-    Feedback.delete_feedback_by_id(3,2)
+    Feedback.delete_feedback_by_id(2,1)
+  end
+
+  def test_get_by_id do
+    Customer.get_customer_by_id(1)
   end
 end

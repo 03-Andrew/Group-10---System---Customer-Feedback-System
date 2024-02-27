@@ -9,8 +9,6 @@ defmodule Feedback.Customer do
     field :username, :string
     field :email, :string
     field :password, :string
-    # Add other fields as needed (e.g., role, preferences)
-   timestamps()
   end
 
 
@@ -59,7 +57,7 @@ defmodule Feedback.Customer do
   end
 
   def change_password(customer, old_pass, new_pass) do
-    case old_pass == new_pass do
+    case old_pass == customer.password do
       true ->
           case customer do
         nil ->
@@ -69,13 +67,14 @@ defmodule Feedback.Customer do
 
           case Repo.update(changeset) do
             {:ok, _updated_customer} ->
-              {:ok, "Successfully updated"}
-            {:error, changeset} ->
-              {:error, changeset}
+              IO.puts("Password Changed")
+            {:error, _changeset} ->
+              IO.puts("Error")
           end
       end
       false ->
         {:error, "Incorrect old password"}
+        IO.puts("Incorrct Password")
     end
   end
 
@@ -93,11 +92,15 @@ defmodule Feedback.Customer do
   end
 
   defp format_customer(customer) do
-    " \n| #{customer.id} | #{customer.name} | #{customer.username} | #{customer.email} |  #{customer.inserted_at} |"
+    " \n|ID: #{customer.id} |Name: #{customer.name} |Username: #{customer.username} |Email: #{customer.email} |"
   end
 
 
   def get_customer_by_email(email) do
     from(c in Customer, where: c.email == ^email) |> Repo.one()
+  end
+
+  def get_customer_by_id(id) do
+    from(c in Customer, where: c.id == ^id) |> Repo.one()
   end
 end

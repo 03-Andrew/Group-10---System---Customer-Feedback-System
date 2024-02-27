@@ -3,7 +3,7 @@ import Config
 config :feedback, Feedback.Repo,
   database: "feedback_repo",
   username: "postgres",
-  password: "123",
+  password: "postgres",
   hostname: "localhost",
   loggers: [{Ecto.LogEntry, :log, [:error]}]
 
