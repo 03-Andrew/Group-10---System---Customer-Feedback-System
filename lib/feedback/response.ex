@@ -21,4 +21,10 @@ defmodule Feedback.Response do
     |> Repo.insert()
   end
 
+  def add_response_types do
+    add_response(%{status: "Not Responded"})
+    add_response(%{status: "Responded"})
+  end
+
+
 end

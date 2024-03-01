@@ -129,6 +129,25 @@ defmodule Feedback.Feedback do
     end
   end
 
+  def delete_feedback_by_customer_id(customer_id) do
+    feedbacks = Repo.all(Feedback)
+    feedbacks_to_delete = Enum.filter(feedbacks, fn feedback -> feedback.customer_id == customer_id end)
+
+    if Enum.empty?(feedbacks_to_delete) do
+      IO.puts("No feedback found for customer with ID #{customer_id}")
+    else
+      Enum.each(feedbacks_to_delete, fn feedback ->
+        case Repo.delete(feedback) do
+          {:ok, _deleted_feedback} ->
+            IO.puts("Feedback with ID #{feedback.id} deleted successfully")
+          {:error, _changeset} ->
+            IO.puts("Failed to delete feedback with ID #{feedback.id}")
+        end
+      end)
+    end
+  end
+
+
   def truncate_feedback_table do
     Feedback
     |> Repo.delete_all()

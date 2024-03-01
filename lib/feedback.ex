@@ -300,7 +300,8 @@ defmodule Feedback do
             "      (4) Edit Feedback              \n"<>
             "      (5) Edit Customer Details      \n"<>
             "      (6) Delete Feedback            \n"<>
-            "      (7) Log out                    \n"<>
+            "      (7) Delete Account             \n"<>
+            "      (8) Log out                    \n"<>
             "                                      ")
   end
 
@@ -343,7 +344,20 @@ defmodule Feedback do
     option_page(customer)
   end
 
-  defp option("7", _customer) do
+  defp option("7", customer) do
+    password = input("Enter Password")
+    if password == customer.password do
+      Feedback.delete_feedback_by_customer_id(customer.id)
+      Customer.delete_customer_by_id(customer.id)
+      IO.puts("Account deleted")
+      main_menu()
+    else
+      IO.puts("Failed to delete account")
+      customer_page(customer)
+    end
+  end
+
+  defp option("8", _customer) do
     main_menu()
   end
 

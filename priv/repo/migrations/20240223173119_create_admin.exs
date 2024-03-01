@@ -8,4 +8,6 @@ defmodule Feedback.Repo.Migrations.CreateAdmin do
       add :password, :string
     end
   end
+
+
 end

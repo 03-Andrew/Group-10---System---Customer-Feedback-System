@@ -1,6 +1,7 @@
 defmodule Feedback.Admin do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Feedback.{Admin, Repo}
 
   schema "admin" do
     field :name, :string
@@ -14,4 +15,12 @@ defmodule Feedback.Admin do
     |> cast(attrs, [:name, :email, :password])
     |> validate_required([:name, :email, :password])
   end
+
+
+  def add_admin(params \\ %{}) do
+    %Admin{}
+    |> changeset(params)
+    |> Repo.insert()
+  end
+
 end
