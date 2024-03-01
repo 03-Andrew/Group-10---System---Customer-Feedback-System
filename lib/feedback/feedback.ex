@@ -43,20 +43,30 @@ defmodule Feedback.Feedback do
   end
 
   def get_feedbacks_by_customer(customer_id) do
-    Feedback
-    |> where([f], f.customer_id == ^customer_id)
-    |> Repo.all()
-    |> Repo.preload([:customer, :response_status])
-    |> Enum.each(&print_feedback/1)
+    case Feedback |> where([f], f.customer_id == ^customer_id) |> Repo.all() do
+      [] ->
+        IO.puts("No feedbacks")
+      feedbacks ->
+        feedbacks
+        |> Repo.preload([:customer, :response_status])
+        |> Enum.each(&print_feedback/1)
+    end
   end
 
   def get_feedbacks_by_response(response_id) do
-    Feedback
-    |> where([f], f.response_status_id == ^response_id)
-    |> Repo.all()
-    |> Repo.preload([:customer, :response_status])
-    |> Enum.each(&print_feedback/1)
+    case Feedback
+        |> where([f], f.response_status_id == ^response_id)
+        |> Repo.all() do
+      [] ->
+        :no_feedbacks
+      feedbacks ->
+        feedbacks
+        |> Repo.preload([:customer, :response_status])
+        |> Enum.each(&print_feedback/1)
+    end
   end
+
+
 
   defp print_feedback(feedback) do
     formatted_feedback = format_feedback(feedback)

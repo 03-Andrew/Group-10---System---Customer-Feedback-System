@@ -81,10 +81,14 @@ defmodule Feedback.Customer do
 
 
   def get_all_customers do
-    Customer
-    |> Repo.all()
-    |> Enum.each(&print_customer/1)
+    Repo.transaction(fn ->
+      Customer
+      |> Repo.stream()
+      |> Stream.each(&print_customer/1)
+      |> Stream.run()
+    end)
   end
+
 
   defp print_customer(customer) do
     formatted_customer = format_customer(customer)

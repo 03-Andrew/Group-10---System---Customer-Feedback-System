@@ -6,6 +6,17 @@ defmodule Feedback do
     main_menu()
   end
 
+  defp feedback_print do
+    IO.puts("╭───────────────────────────────────╮\n"<>
+            "│          Add a feedback           │\n"<>
+            "╰───────────────────────────────────╯\n")
+
+  end
+
+  # --------------------------------------------------------------------------------------------------------
+  # ---------------------------------------------Main Menu-----------------------------------------------------
+  # --------------------------------------------------------------------------------------------------------
+
   defp menu_print1 do
     IO.puts("╭───────────────────────────────────╮\n"<>
             "│          Feedback System          │\n"<>
@@ -17,28 +28,6 @@ defmodule Feedback do
             "      (5) Exit                       \n")
   end
 
-
-  defp admin_print do
-    IO.puts("╭───────────────────────────────────╮\n"<>
-            "│              Admin                │\n"<>
-            "╰───────────────────────────────────╯\n"<>
-            "      (1) view all customers         \n"<>
-            "      (2) view all feedbacks         \n"<>
-            "      (3) respond to feedbacks       \n"<>
-            "      (4) Back to menu               \n")
-
-  end
-
-  defp feedback_print do
-    IO.puts("╭───────────────────────────────────╮\n"<>
-            "│          Add a feedback           │\n"<>
-            "╰───────────────────────────────────╯\n")
-
-  end
-
-  # --------------------------------------------------------------------------------------------------------
-  # ---------------------------------------------Main Menu-----------------------------------------------------
-  # --------------------------------------------------------------------------------------------------------
   def main_menu do
     menu_print1()
     option = input("What do you want to do: ")
@@ -133,6 +122,17 @@ defmodule Feedback do
   # --------------------------------------------------------------------------------------------------------
   # ----------------------------------------------Admin-----------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
+  defp admin_print do
+    IO.puts("╭───────────────────────────────────╮\n"<>
+            "│              Admin                │\n"<>
+            "╰───────────────────────────────────╯\n"<>
+            "      (1) view all customers         \n"<>
+            "      (2) view all feedbacks         \n"<>
+            "      (3) respond to feedbacks       \n"<>
+            "      (4) Back to menu               \n")
+
+  end
+
   def admin_login do
     username = input("Username: ")
     pass = input("Password: ")
@@ -168,11 +168,22 @@ defmodule Feedback do
   end
 
   defp admin_op("3") do
-    Feedback.get_feedbacks_by_response(1)
-    id = input("Enter feedback ID to respond to: ") |> String.to_integer()
-    Feedback.edit_feedback_field(id, :response_status_id, 2)
-    a_option_page()
+    case Feedback.get_feedbacks_by_response(1) do
+      :no_feedbacks ->
+        IO.puts("No feedbacks found.")
+        a_option_page()
+      _feedbacks ->
+        case input("Enter feedback ID to respond to: ") |> String.to_integer() do
+          id when is_integer(id) and id > 0 ->
+            Feedback.edit_feedback_field(id, :response_status_id, 2)
+            a_option_page()
+          _ ->
+            IO.puts("Invalid feedback ID.")
+            a_option_page()
+        end
+    end
   end
+
 
   defp admin_op("4"), do: main_menu()
   defp admin_op(_) do
@@ -213,24 +224,31 @@ defmodule Feedback do
   # --------------------------------------------------------------------------------------------------------
 
   def edit_feedback(customer) do
-    feedback_id = input("Enter feedback id: ") |> String.to_integer()
-    IO.puts("Field to edit: \n   (1) Caption\n   (2) Rating\n   (3) Comment")
+    feedback_id = input("Enter feedback id (0 to quit): ") |> String.to_integer()
+    case feedback_id do
+      0 -> customer_page(customer)
+      _ ->
+        IO.puts("Field to edit:")
+        IO.puts("  (1) Caption")
+        IO.puts("  (2) Rating")
+        IO.puts("  (3) Comment")
 
-    op = edit_field(input(""), customer)
-    val = input("Enter new value: ")
-    val =
-    if op == :rating do
-      val |> String.to_integer()
-    else
-      val
+        op = edit_field(input(""), customer)
+        val = input("Enter new value: ")
+        val = convert_value(op, val)
+
+        Feedback.edit_feedback_field(feedback_id, op, val)
     end
-    Feedback.edit_feedback_field(feedback_id, op, val)
   end
 
   def edit_field("1", _customer), do: :caption
   def edit_field("2", _customer), do: :rating
   def edit_field("3", _customer), do: :comments
-  def edit_field(_, customer), do: edit_feedback(customer)
+  def edit_field(_, customer), do: customer_page(customer)
+
+  defp convert_value(:rating, val), do: String.to_integer(val)
+  defp convert_value(_, val), do: val
+
 
 
   # --------------------------------------------------------------------------------------------------------
@@ -239,10 +257,17 @@ defmodule Feedback do
 
 
   def edit_customer_deets(customer) do
-    IO.puts("Field to edit: \n   (1) Name\n   (2) Username\n   (3) Email\n   (4) Password")
-    op = c_edit_field(input("") |> String.to_integer())
+    IO.puts("Field to edit:"<>
+            "      (1) Name     (#{customer.name})\n"<>
+            "      (2) Username (#{customer.username})\n"<>
+            "      (3) Email    (#{customer.email})\n"<>
+            "      (4) Password  \n"<>
+            "      (5) Back \n")
+    op = c_edit_field(input("What do you want to do:  ") |> String.to_integer())
     handle_edit_operation(customer, op)
   end
+
+  defp handle_edit_operation(customer, :ok), do: customer_page(customer)
 
   defp handle_edit_operation(customer, :password) do
     old_pass = input("Enter old password: ")
@@ -259,7 +284,7 @@ defmodule Feedback do
   defp c_edit_field(2), do: :username
   defp c_edit_field(3), do: :email
   defp c_edit_field(4), do: :password
-  defp c_edit_field(_), do: :ok
+  defp c_edit_field(5), do: :ok
   # --------------------------------------------------------------------------------------------------------
   # ----------------------------------------Customer Page---------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
@@ -374,6 +399,11 @@ defmodule Feedback do
     |> String.trim
   end
 end
+
+Feedback.start
+
+
+
 
   # def log_in do
   #   email = input("Email: ")

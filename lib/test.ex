@@ -9,7 +9,7 @@ defmodule Test do
   end
 
   def test_add_response do
-    Response.add_response(%{status: "Responded"})
+    Response.add_response(%{status: "Not Responded"})
   end
 
   def test_get_feedback_by do
