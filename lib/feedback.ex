@@ -345,7 +345,7 @@ defmodule Feedback do
   end
 
   defp option("7", customer) do
-    password = input("Enter Password")
+    password = input("Enter Password: ")
     if password == customer.password do
       Feedback.delete_feedback_by_customer_id(customer.id)
       Customer.delete_customer_by_id(customer.id)
