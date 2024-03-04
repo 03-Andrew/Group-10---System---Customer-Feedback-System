@@ -100,7 +100,15 @@ defmodule Feedback do
     name = input("Name: ")
     username = input("UserName: ")
     email = input("Email: ")
+    if not String.match?(email, ~r/@/) do
+      IO.puts("No @")
+      create_account()
+    end
     password = input("Password: ")
+    if String.length(password) < 6 do
+      IO.puts("Password is less than 6")
+      create_account()
+    end
     confirm_pass = input("Confirm Pass: ")
 
     case password do
@@ -414,7 +422,7 @@ defmodule Feedback do
   end
 end
 
-Feedback.start
+
 
 
 

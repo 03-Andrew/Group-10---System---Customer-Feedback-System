@@ -6,7 +6,7 @@ defmodule Test do
     Customer.add_customer(%{name: "Maxey", username: "Bob", email: "bob@email.com", password: "123456789"})
   end
   def test_add_feedback do
-    Feedback.add_feedback(%{rating: 4, caption: "My 2nd trip", comments: "It was so fun", response_status_id: 1, customer_id: 2});
+    Feedback.add_feedback(%{rating: 4, caption: "My 2nd trip", comments: "It was so fun", response_status_id: 1, customer_id: 3});
   end
 
   def add_response_type do
