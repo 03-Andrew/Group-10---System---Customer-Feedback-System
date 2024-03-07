@@ -222,9 +222,11 @@ defmodule Feedback do
   defp get_feedback_data(id) do
     caption = input("Caption:\n  ")
     rate = input("Rate (0-5):\n  ")
-          |> String.to_integer()
+          |> String.to_float()
           |> Kernel.max(0)
           |> Kernel.min(5)
+          |> Kernel.floor()
+          |> round()
     comment = input("Comment:\n  ")
     %{rating: rate, caption: caption, comments: comment, response_status_id: 1, customer_id: id}
   end
