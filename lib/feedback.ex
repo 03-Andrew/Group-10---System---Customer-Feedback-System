@@ -69,6 +69,7 @@ defmodule Feedback do
     case email do
       nil ->
         IO.puts("User not found.")
+        main_menu()
       customer ->
         attempt_login(customer)
     end
@@ -80,6 +81,7 @@ defmodule Feedback do
 
   defp attempt_login(nil) do
     IO.puts("User not found.")
+    main_menu()
   end
 
   defp attempt_login(%Customer{} = customer) do
