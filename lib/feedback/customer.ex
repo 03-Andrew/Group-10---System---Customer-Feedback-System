@@ -104,6 +104,12 @@ defmodule Feedback.Customer do
     from(c in Customer, where: c.email == ^email) |> Repo.one()
   end
 
+  def get_customer_email(email) do
+    customer_records = from(c in Customer, where: c.email == ^email) |> Repo.all()
+    customer_count = Enum.count(customer_records)
+    customer_count
+  end
+
   def get_customer_by_id(id) do
     from(c in Customer, where: c.id == ^id) |> Repo.one()
   end

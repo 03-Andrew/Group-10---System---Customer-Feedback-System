@@ -31,22 +31,21 @@ defmodule Feedback do
   def main_menu do
     menu_print1()
     option = input("What do you want to do: ")
-    |> String.to_integer()
     option(option)
   end
 
-  defp option(1), do: login() # (1) Log in
+  defp option("1"), do: login() # (1) Log in
 
-  defp option(2), do: create_account() # (2) Create Account
+  defp option("2"), do: create_account() # (2) Create Account
 
-  defp option(3) do
+  defp option("3") do
     Feedback.get_all_feedbacks() # (3) View Feedbacks as guest
     option_page()
   end
 
-  defp option(4), do: admin_login() # (4) Admin
+  defp option("4"), do: admin_login() # (4) Admin
 
-  defp option(5), do: System.halt()  # (5) Quit
+  defp option("5"), do: System.halt()  # (5) Quit
 
   defp option(_) do
     IO.puts("Invalid option")
@@ -98,11 +97,11 @@ defmodule Feedback do
   # -----------------------------------------Create Account-------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
   def create_account do
-    IO.puts("Enter user details (Type :back to quit)")
-    name = input("Name: ") |> chechIfBack()
-    username = input("UserName: ") |> chechIfBack()
-    email = input("Email: ") |> chechIfBack() |> validateEmail()
-    password = input("Password (more than 6): ") |> validatePass()
+    IO.puts("Enter user details ")
+    name = input("Name: ")
+    username = input("UserName: ")
+    email = input("Email: ") |> validateEmail() |> doesEmailExist()
+    password = input("Password (more than 5): ") |> validatePass()
     confirm_pass = input("Confirm Pass: ")
 
     case password do
@@ -120,18 +119,19 @@ defmodule Feedback do
   end
 
 
-  defp chechIfBack(input) do
-    if input == ":back" do
-      main_menu()
-    else
-      input
-    end
-
-  end
-
   defp validateEmail(email) do
     if not String.match?(email, ~r/@/) do
       IO.puts("No @")
+      create_account()
+    else
+      email
+    end
+  end
+
+  defp doesEmailExist(email) do
+    userEmail = Customer.get_customer_email(email)
+    if userEmail >= 1 do
+      IO.puts("Email Exists")
       create_account()
     else
       email
@@ -238,14 +238,27 @@ defmodule Feedback do
 
   defp get_feedback_data(id) do
     caption = input("Caption:\n  ")
-    rate = input("Rate (0-5):\n  ")
-          |> String.to_float()
-          |> Kernel.max(0)
-          |> Kernel.min(5)
-          |> Kernel.floor()
-          |> round()
+    rateStr = input("Rate (0-5):\n  ")
+    rate = parse_rate(rateStr)
     comment = input("Comment:\n  ")
     %{rating: rate, caption: caption, comments: comment, response_status_id: 1, customer_id: id}
+  end
+
+  defp parse_rate(rateStr) do
+    try do
+      rateStr
+      |> String.to_float()
+      |> Kernel.max(0)
+      |> Kernel.min(5)
+      |> Kernel.floor()
+      |> round()
+    catch
+      :error, _ ->
+        rateStr
+        |> String.to_integer()
+        |> Kernel.max(0)
+        |> Kernel.min(5)
+    end
   end
 
   # --------------------------------------------------------------------------------------------------------
