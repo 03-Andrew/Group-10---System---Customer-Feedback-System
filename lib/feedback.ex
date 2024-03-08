@@ -46,7 +46,7 @@ defmodule Feedback do
 
   defp option(4), do: admin_login() # (4) Admin
 
-  defp option(5), do: :ok
+  defp option(5), do: System.halt()  # (5) Quit
 
   defp option(_) do
     IO.puts("Invalid option")
@@ -98,19 +98,11 @@ defmodule Feedback do
   # -----------------------------------------Create Account-------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
   def create_account do
-    IO.puts("Enter user details:")
-    name = input("Name: ")
-    username = input("UserName: ")
-    email = input("Email: ")
-    if not String.match?(email, ~r/@/) do
-      IO.puts("No @")
-      create_account()
-    end
-    password = input("Password: ")
-    if String.length(password) < 6 do
-      IO.puts("Password is less than 6")
-      create_account()
-    end
+    IO.puts("Enter user details (Type :back to quit)")
+    name = input("Name: ") |> chechIfBack()
+    username = input("UserName: ") |> chechIfBack()
+    email = input("Email: ") |> chechIfBack() |> validateEmail()
+    password = input("Password (more than): ") |> validatePass()
     confirm_pass = input("Confirm Pass: ")
 
     case password do
@@ -120,8 +112,6 @@ defmodule Feedback do
             IO.puts("User created successfully.")
             main_menu()
           _ ->
-            if not String.match?(email, ~r/@/), do: IO.puts("Email has no '@'")
-            if String.length(password) < 6, do: IO.puts("Password is less than 6")
             IO.puts("Failed to add customer")
         end
       _ ->
@@ -129,6 +119,33 @@ defmodule Feedback do
     end
   end
 
+
+  defp chechIfBack(input) do
+    if input == ":back" do
+      main_menu()
+    else
+      input
+    end
+
+  end
+
+  defp validateEmail(email) do
+    if not String.match?(email, ~r/@/) do
+      IO.puts("No @")
+      create_account()
+    else
+      email
+    end
+  end
+
+  defp validatePass(pass) do
+    if String.length(pass) < 6 do
+      IO.puts("Password is less than 6")
+      create_account()
+    else
+      pass
+    end
+  end
   # --------------------------------------------------------------------------------------------------------
   # ----------------------------------------------Admin-----------------------------------------------------
   # --------------------------------------------------------------------------------------------------------
