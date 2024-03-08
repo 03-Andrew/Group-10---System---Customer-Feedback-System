@@ -102,7 +102,7 @@ defmodule Feedback do
     name = input("Name: ") |> chechIfBack()
     username = input("UserName: ") |> chechIfBack()
     email = input("Email: ") |> chechIfBack() |> validateEmail()
-    password = input("Password (more than): ") |> validatePass()
+    password = input("Password (more than 6): ") |> validatePass()
     confirm_pass = input("Confirm Pass: ")
 
     case password do
